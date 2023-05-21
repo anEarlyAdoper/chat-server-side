@@ -7,28 +7,27 @@ import socket
 host = "127.0.0.1"
 port = 5555  # Choose any random port which is not so common (like 80)
 
+adminpass = "password"
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the server to IP Address
 server.bind((host, port))
 # Start Listening Mode
 server.listen()
 # List to contain the Clients getting connected and nicknames
-adminpass = "password"
+
 clients = []
 nicknames = []
 addresses = []
 role = []
 #
 semaphore = Semaphore()
-
-
 # 1.Broadcasting Method
 def broadcast(message):
     semaphore.acquire()
     for client in clients:
         client.send(message)
     semaphore.release()
-
 
 def broadcastexcept(message, exceptt):
     semaphore.acquire()
@@ -77,6 +76,9 @@ def handle(client):
                 broadcastexcept('GIVEMEKEY'.encode(), 'admin')
 
             elif msg.decode().startswith('MYKEY'):
+                unicast(msg, 'admin')
+
+            elif msg.decode().startswith('MYPHRASE'):
                 unicast(msg, 'admin')
 
             elif msg.decode().startswith('BAN'):
